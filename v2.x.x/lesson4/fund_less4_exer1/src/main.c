@@ -9,10 +9,12 @@
 #include <zephyr/devicetree.h>
 #include <zephyr/drivers/gpio.h>
 /* STEP 6 - Include the header file of printk */
+#include <zephyr/sys/printk.h>
 
 /* STEP 8.1 - Define the macro MAX_NUMBER_FACT that represents the maximum number to calculate its factorial  */
+#define MAX_NUM_FACTORIAL (10)
 
-#define SLEEP_TIME_MS   10*60*1000
+#define SLEEP_TIME_MS   (10*60*1000)
 
 #define SW0_NODE	DT_ALIAS(sw0)
 static const struct gpio_dt_spec button = GPIO_DT_SPEC_GET(SW0_NODE, gpios);
@@ -25,6 +27,20 @@ void button_pressed(const struct device *dev, struct gpio_callback *cb,
 		    uint32_t pins)
 {
 	gpio_pin_toggle_dt(&led);
+	uint32_t fact;
+	for (uint8_t i = 1; MAX_NUM_FACTORIAL >= i; i++)
+	{
+		fact = 1;
+
+		for (uint32_t j = 1; i >= j ; j++)
+		{
+			fact *= j;
+		}
+		
+
+		printk("\r\nFACTORIAL OF %2d IS %d", i, fact);
+	}
+
 }
 
 static struct gpio_callback button_cb_data;
@@ -33,6 +49,7 @@ void main(void)
 {
 	int ret;
 	/* STEP 7 - Print a simple banner */
+	printk("\r\nnRF Connect SDK Fundamentals - Lesson 4 - Exercise 1\r\n");
 
 	/* Only checking one since led.port and button.port point to the same device, &gpio0 */
 	if (!device_is_ready(led.port)) {

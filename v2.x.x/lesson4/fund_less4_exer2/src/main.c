@@ -10,6 +10,7 @@
 #include <zephyr/drivers/gpio.h>
 #include <zephyr/sys/printk.h>
 /* STEP 4 - Include the header file of the logger module */
+#include <zephyr/logging/log.h>
 
 
 #define MAX_NUMBER_FACT 10
@@ -22,28 +23,16 @@ static const struct gpio_dt_spec button = GPIO_DT_SPEC_GET(SW0_NODE, gpios);
 static const struct gpio_dt_spec led = GPIO_DT_SPEC_GET(LED0_NODE, gpios);
 
 /* STEP 5 - Register your code with the logger */
-
+LOG_MODULE_REGISTER(Less4_Ex2, LOG_LEVEL_DBG);
 
 /* STEP 7 - Replace the callback function button_pressed() */
-void button_pressed(const struct device *dev, struct gpio_callback *cb,
-		    uint32_t pins)
+void button_pressed(const struct device *dev, struct gpio_callback *cb, uint32_t pins)
 {
-  int i;
-  int j;
-  long int factorial;
-  printk("Calculating the factorials of numbers from 1 to %d:\n\r",MAX_NUMBER_FACT);
-  for (i=1;i<=MAX_NUMBER_FACT;i++){
-	   factorial =1;
-	    for (j=1;j<=i;j++){
-			factorial = factorial*j;
-		}
-		printk("The factorial of %2d = %ld\n\r",i,factorial);
-  }
-  printk("_______________________________________________________\n\r");
-  /*Important note! 
-  Code in ISR runs at a high priority, therefore, it should be written with timing in mind.
-  Too lengthy or too complex tasks should not be performed by an ISR, they should be deferred to a thread. 
-  */
+	/*Important note! 
+	Code in ISR runs at a high priority, therefore, it should be written with timing in mind.
+	Too lengthy or too complex tasks should not be performed by an ISR, they should be deferred to a thread. 
+	*/
+	LOG_INF("Ouch, you poked me");
 }
 
 static struct gpio_callback button_cb_data;
@@ -52,7 +41,22 @@ void main(void)
 {
 	int ret;
 	/* STEP 6 - Write some logs */
-	printk("nRF Connect SDK Fundamentals - Lesson 4 - Exercise 1\n\r");
+	const int exercise_num = 2;
+	uint8_t data[] = {
+		0x00, 0x01, 0x02, 0x03,
+		0x04, 0x05, 0x06, 0x07,
+		'H', 'e', 'l', 'l', 'o', '\0'
+	};
+
+	// Logging messages
+	LOG_INF("nRF Connect SDK Fundamentals - Lesson 4");
+	LOG_INF("Exercise %d", exercise_num);
+	LOG_DBG("Debug Message");
+	LOG_WRN("You are a cock");
+	LOG_ERR("Cock mode cannot be disabled...");
+
+	// Hex dump
+	LOG_HEXDUMP_INF(data, sizeof(data), "Sample Data!");
 
 	/* Only checking one since led.port and button.port point to the same device, &gpio0 */
 	if (!device_is_ready(led.port)) {

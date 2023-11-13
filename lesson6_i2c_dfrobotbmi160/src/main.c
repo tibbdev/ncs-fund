@@ -38,7 +38,7 @@ int main(void)
    };
 
    ret = i2c_write_dt(&sensor_i2c, int_en, sizeof(int_en));
-   if(ret)
+   if(0 != ret)
    {
       LOG_ERR("FAILED to write to I2C(0x%02x) at REG:0x%02x\r\n", sensor_i2c.addr, int_en[0]);
       return -1;
